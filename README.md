@@ -1,5 +1,7 @@
 # 🎵 PlaylistToM3U
 
+> 📖 [Baca dalam Bahasa Indonesia](README_ID.md)
+
 **Convert Spotify playlist CSV exports into M3U playlist files** by fuzzy-matching track titles and artist names against your local audio library.
 
 Built for music collectors who use [Exportify](https://exportify.net/) to export their Spotify playlists and want to play them on offline music players like **Hiby Music**, **foobar2000**, **Poweramp**, or any M3U-compatible player.
@@ -127,8 +129,13 @@ python -m PyInstaller --onefile --windowed --name playlisttom3u playlisttom3u.py
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Credits
+## 🙏 Credits & Contributors
 
-- CSV export: [Exportify](https://exportify.net/)
-- Matching algorithm: Python's `difflib.SequenceMatcher`
-- Built with ❤️ using Python and Tkinter
+- **[Dananjaya08](https://github.com/Dananjaya08)** — Project creator & maintainer
+- **[Google Gemini](https://gemini.google.com/)** — AI assistant that helped design the matching algorithm, CJK support, and overall architecture
+- **[Anthropic Claude](https://claude.ai/)** — AI assistant that helped implement bilingual UI, artist fallback logic, documentation, and polish the final release
+- **[Exportify](https://exportify.net/)** — Spotify playlist CSV export tool
+- Built with Python's `difflib.SequenceMatcher` and Tkinter
+
+> This project was made possible through human-AI collaboration. Gemini and Claude helped turn a simple idea into a fully-featured playlist converter — from debugging matching issues to handling CJK characters and building the final release. 🤝
+
