@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Executable
+*.exe
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Audio files (don't commit test data)
+*.flac
+*.mp3
+*.wav
+*.aac
+*.m4a
+*.ogg
+*.opus
+*.csv
+
+# Reports & playlists (output files)
+*.m3u
+*_report.txt
+*_laporan.txt
+aliases.txt
