@@ -23,7 +23,7 @@ Built for music collectors who use [Exportify](https://exportify.net/) to export
 
 ### Option 1: Download the EXE (Windows)
 
-Download `playlisttom3u.exe` from the [Releases](https://github.com/Dananjaya08/playlist-to-m3u/releases) page. No installation needed — just double-click and run.
+Download `playlisttom3u_v1.1.exe` from the [Releases](https://github.com/Dananjaya08/playlist-to-m3u/releases) page. No installation needed — just double-click and run.
 
 ### Option 2: Run from Source
 
@@ -44,7 +44,7 @@ python playlisttom3u.py
 3. Export your playlist as CSV
 
 ### Step 2: Run PlaylistToM3U
-1. Launch `playlisttom3u.exe` (or run `python playlisttom3u.py`)
+1. Launch `playlisttom3u_v1.1.exe` (or run `python playlisttom3u.py`)
 2. **Select Language** — choose English or Indonesia from the dropdown
 3. **Select CSV File** — pick the CSV file(s) you exported from Exportify
 4. **Select Audio Folder** — choose the folder containing your local audio files (FLAC, MP3, etc.)
@@ -116,7 +116,7 @@ CSV Entry                          Audio File
 pip install pyinstaller
 
 # Build the EXE
-python -m PyInstaller --onefile --windowed --name playlisttom3u playlisttom3u.py
+python -m PyInstaller --onefile --windowed --name playlisttom3u_v1.1 playlisttom3u.py
 
 # The EXE will be in the dist/ folder
 ```

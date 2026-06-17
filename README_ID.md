@@ -23,7 +23,7 @@ Dibuat untuk kolektor musik yang menggunakan [Exportify](https://exportify.net/)
 
 ### Opsi 1: Download EXE (Windows)
 
-Download `playlisttom3u.exe` dari halaman [Releases](https://github.com/Dananjaya08/playlist-to-m3u/releases). Tidak perlu instalasi — cukup klik dua kali dan jalankan.
+Download `playlisttom3u_v1.1.exe` dari halaman [Releases](https://github.com/Dananjaya08/playlist-to-m3u/releases). Tidak perlu instalasi — cukup klik dua kali dan jalankan.
 
 ### Opsi 2: Jalankan dari Source Code
 
@@ -44,7 +44,7 @@ python playlisttom3u.py
 3. Ekspor playlist Anda sebagai CSV
 
 ### Langkah 2: Jalankan PlaylistToM3U
-1. Buka `playlisttom3u.exe` (atau jalankan `python playlisttom3u.py`)
+1. Buka `playlisttom3u_v1.1.exe` (atau jalankan `python playlisttom3u.py`)
 2. **Pilih Bahasa** — pilih English atau Indonesia dari dropdown
 3. **Pilih File CSV** — pilih file CSV yang sudah diekspor dari Exportify
 4. **Pilih Folder Audio** — pilih folder yang berisi file audio lokal Anda (FLAC, MP3, dll.)
@@ -116,7 +116,7 @@ Entry CSV                          File Audio
 pip install pyinstaller
 
 # Build EXE
-python -m PyInstaller --onefile --windowed --name playlisttom3u playlisttom3u.py
+python -m PyInstaller --onefile --windowed --name playlisttom3u_v1.1 playlisttom3u.py
 
 # EXE akan berada di folder dist/
 ```
