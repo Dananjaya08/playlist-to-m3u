@@ -199,6 +199,46 @@ def trad_to_simp(text: str) -> str:
     return text.translate(TRAD_TO_SIMP)
 
 
+# ─────────────────────────────────────────────
+#  NOISE WORDS — Generic terms that cause
+#  false matches in EDM/Phonk/Funk genres
+# ─────────────────────────────────────────────
+NOISE_WORDS = {
+    "slowed", "super slowed", "ultra slowed", "slowed down",
+    "sped up", "sped", "speed up", "nightcore",
+    "reverb", "reverbed", "bass boosted",
+    "remix", "version", "edit", "remaster", "remastered",
+    "instrumental", "extended", "radio", "original",
+    "8d", "8d audio", "tiktok", "tiktok version",
+    "montagem", "automotivo",  # Brazilian funk genre prefixes
+}
+
+# Single noise tokens (matched individually after splitting)
+NOISE_TOKENS = {
+    "slowed", "sped", "reverb", "reverbed", "remix", "version",
+    "edit", "remaster", "remastered", "instrumental", "extended",
+    "radio", "original", "nightcore", "boosted", "bass",
+    "super", "ultra", "8d", "audio", "tiktok",
+    "montagem", "automotivo",  # Brazilian funk genre prefixes
+}
+
+
+def strip_noise_words(text: str) -> str:
+    """Remove generic/noise words from a normalized title.
+    
+    This strips terms like 'slowed', 'sped up', 'remix' etc.
+    so that only the unique core title remains for comparison.
+    """
+    # First remove multi-word noise phrases
+    result = text
+    for phrase in sorted(NOISE_WORDS, key=len, reverse=True):
+        result = result.replace(phrase, " ")
+    # Then remove single noise tokens
+    tokens = result.split()
+    tokens = [t for t in tokens if t not in NOISE_TOKENS and len(t) > 0]
+    return " ".join(tokens).strip()
+
+
 def extract_alt_titles(text: str) -> list[str]:
     """Extract alternative titles from inside parentheses/brackets.
     
@@ -342,29 +382,80 @@ def score_match(csv_track: str, csv_artist: str, file_info: dict) -> float:
         without_artist = (track_score * 0.85) + substring_bonus
         final = max(with_artist, without_artist)
             
-        return final
+        return final, artist_score
 
-    score_normal = _calc(file_track, file_artist)
-    score_swapped = _calc(file_artist, file_track)
+    score_normal, artist_score_normal = _calc(file_track, file_artist)
+    score_swapped, artist_score_swapped = _calc(file_artist, file_track)
     
-    return min(max(score_normal, score_swapped), 1.0)
+    best_score = max(score_normal, score_swapped)
+    best_artist_score = max(artist_score_normal, artist_score_swapped)
+    
+    # === CORE TITLE VALIDATION ===
+    # Strip noise words and compare core titles.
+    # If core titles are very different, penalize the score.
+    core_csv = strip_noise_words(norm_csv_track)
+    core_file = strip_noise_words(file_full)
+    core_file_track = strip_noise_words(file_track)
+    
+    if core_csv and core_file:
+        core_sim = max(
+            similarity(core_csv, core_file),
+            similarity(core_csv, core_file_track) if core_file_track else 0.0,
+        )
+        # Also check alt titles against core file
+        for alt in norm_alts:
+            core_alt = strip_noise_words(alt)
+            if core_alt:
+                core_sim = max(core_sim, similarity(core_alt, core_file),
+                               similarity(core_alt, core_file_track) if core_file_track else 0.0)
+        # Also check simplified Chinese core
+        core_csv_simp = strip_noise_words(simp_base)
+        core_file_simp = strip_noise_words(trad_to_simp(file_full))
+        if core_csv_simp and core_file_simp:
+            core_sim = max(core_sim, similarity(core_csv_simp, core_file_simp))
+        
+        # If core titles are very different (< 0.40), the match is almost certainly wrong
+        # But first check substring containment — short cores inside long strings are valid
+        if core_csv and len(core_csv) >= 3:
+            if core_csv in core_file or core_csv in core_file_track:
+                core_sim = max(core_sim, 0.80)
+            if core_file_track and core_file_track in core_csv:
+                core_sim = max(core_sim, 0.80)
+        if core_sim < 0.40 and best_score < 0.90:
+            best_score = best_score * 0.3  # Heavy penalty
+    
+    final_score = min(best_score, 1.0)
+    
+    # Store artist score for artist gate check
+    # We use a simple attribute on the return — caller can check via find_best_match
+    return final_score, best_artist_score
 
 
 def find_best_match(csv_track: str, csv_artist: str, candidates: list[str], 
                      file_cache: dict, threshold: float) -> tuple[str | None, float]:
     best_file  = None
     best_score = 0.0
+    best_artist_score = 0.0
 
     for filename in candidates:
         if filename not in file_cache:
             file_cache[filename] = parse_filename(filename)
         
         file_info = file_cache[filename]
-        score = score_match(csv_track, csv_artist, file_info)
+        score, artist_score = score_match(csv_track, csv_artist, file_info)
 
         if score > best_score:
             best_score = score
             best_file  = filename
+            best_artist_score = artist_score
+
+    # === ARTIST GATE ===
+    # For low-confidence matches, require at least some artist overlap.
+    # This prevents "SPACE! Super Slowed" from matching "ice super slowed"
+    # when the artists are completely different.
+    if best_file and best_score < 0.85 and best_artist_score < 0.35:
+        # No meaningful artist overlap + low score = reject
+        return None, best_score
 
     if best_score >= threshold:
         return best_file, best_score
