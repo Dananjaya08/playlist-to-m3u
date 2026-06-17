@@ -23,7 +23,7 @@ Built for music collectors who use [Exportify](https://exportify.net/) to export
 
 ### Option 1: Download the EXE (Windows)
 
-Download `playlisttom3u_v1.1.exe` from the [Releases](https://github.com/Dananjaya08/playlist-to-m3u/releases) page. No installation needed — just double-click and run.
+Download `playlisttom3u_v1.2.exe` from the [Releases](https://github.com/Dananjaya08/playlist-to-m3u/releases) page. No installation needed — just double-click and run.
 
 ### Option 2: Run from Source
 
@@ -44,7 +44,7 @@ python playlisttom3u.py
 3. Export your playlist as CSV
 
 ### Step 2: Run PlaylistToM3U
-1. Launch `playlisttom3u_v1.1.exe` (or run `python playlisttom3u.py`)
+1. Launch `playlisttom3u_v1.2.exe` (or run `python playlisttom3u.py`)
 2. **Select Language** — choose English or Indonesia from the dropdown
 3. **Select CSV File** — pick the CSV file(s) you exported from Exportify
 4. **Select Audio Folder** — choose the folder containing your local audio files (FLAC, MP3, etc.)
@@ -106,7 +106,11 @@ CSV Entry                          Audio File
 
 ## 🆕 Recent Updates
 
-**v1.1 (Latest)**
+**v1.2 (Latest)**
+- **Intelligent Noise Word Filtering**: The converter now automatically strips generic terms (like "Slowed", "Sped Up", "Remix", "Instrumental", "Montagem") before calculating scores, preventing different songs with the same generic tags from falsely matching.
+- **Artist Gate Validation**: For lower confidence score matches, the algorithm now enforces strict artist overlap validation to eliminate false positives.
+
+**v1.1**
 - **Two-Pass Matching Algorithm**: Replaced sequential matching with a two-pass algorithm. The converter now computes scores for all files first, and assigns matches by highest score (greedy assignment). This resolves conflicts where low-score matches could "steal" files from perfect matches, fixing false negatives and significantly improving overall accuracy.
 
 ## 🏗️ Building from Source
@@ -116,7 +120,7 @@ CSV Entry                          Audio File
 pip install pyinstaller
 
 # Build the EXE
-python -m PyInstaller --onefile --windowed --name playlisttom3u_v1.1 playlisttom3u.py
+python -m PyInstaller --onefile --windowed --name playlisttom3u_v1.2 playlisttom3u.py
 
 # The EXE will be in the dist/ folder
 ```

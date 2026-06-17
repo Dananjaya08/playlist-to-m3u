@@ -23,7 +23,7 @@ Dibuat untuk kolektor musik yang menggunakan [Exportify](https://exportify.net/)
 
 ### Opsi 1: Download EXE (Windows)
 
-Download `playlisttom3u_v1.1.exe` dari halaman [Releases](https://github.com/Dananjaya08/playlist-to-m3u/releases). Tidak perlu instalasi — cukup klik dua kali dan jalankan.
+Download `playlisttom3u_v1.2.exe` dari halaman [Releases](https://github.com/Dananjaya08/playlist-to-m3u/releases). Tidak perlu instalasi — cukup klik dua kali dan jalankan.
 
 ### Opsi 2: Jalankan dari Source Code
 
@@ -44,7 +44,7 @@ python playlisttom3u.py
 3. Ekspor playlist Anda sebagai CSV
 
 ### Langkah 2: Jalankan PlaylistToM3U
-1. Buka `playlisttom3u_v1.1.exe` (atau jalankan `python playlisttom3u.py`)
+1. Buka `playlisttom3u_v1.2.exe` (atau jalankan `python playlisttom3u.py`)
 2. **Pilih Bahasa** — pilih English atau Indonesia dari dropdown
 3. **Pilih File CSV** — pilih file CSV yang sudah diekspor dari Exportify
 4. **Pilih Folder Audio** — pilih folder yang berisi file audio lokal Anda (FLAC, MP3, dll.)
@@ -106,7 +106,11 @@ Entry CSV                          File Audio
 
 ## 🆕 Pembaruan Terbaru
 
-**v1.1 (Terbaru)**
+**v1.2 (Terbaru)**
+- **Intelligent Noise Word Filtering**: Aplikasi sekarang secara otomatis membuang istilah generik (seperti "Slowed", "Sped Up", "Remix", "Instrumental", "Montagem") sebelum menghitung skor kemiripan. Ini mencegah lagu yang berbeda namun memiliki tag generik yang sama agar tidak dipasangkan secara keliru.
+- **Validasi Artist Gate**: Untuk hasil pencocokan dengan skor rendah, algoritma kini mewajibkan adanya kecocokan nama artis yang ketat untuk menghilangkan false positives (pencocokan salah).
+
+**v1.1**
 - **Algoritma Pencocokan Two-Pass**: Mengganti pencocokan berurutan dengan algoritma dua tahap (two-pass). Converter sekarang menghitung skor untuk semua file terlebih dahulu, dan memasangkan berdasarkan skor tertinggi. Ini menyelesaikan konflik di mana pencocokan dengan skor rendah bisa "mencuri" file dari pencocokan sempurna, memperbaiki masalah lagu yang dianggap tidak ada (false negative) dan meningkatkan akurasi secara signifikan.
 
 ## 🏗️ Build dari Source Code
@@ -116,7 +120,7 @@ Entry CSV                          File Audio
 pip install pyinstaller
 
 # Build EXE
-python -m PyInstaller --onefile --windowed --name playlisttom3u_v1.1 playlisttom3u.py
+python -m PyInstaller --onefile --windowed --name playlisttom3u_v1.2 playlisttom3u.py
 
 # EXE akan berada di folder dist/
 ```
