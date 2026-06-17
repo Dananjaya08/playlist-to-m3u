@@ -104,6 +104,11 @@ CSV Entry                          Audio File
 5. **Score** — Combine track similarity + artist similarity + substring bonuses
 6. **Fallback** — If standard matching fails, try artist-only matching
 
+## 🆕 Recent Updates
+
+**v1.1 (Latest)**
+- **Two-Pass Matching Algorithm**: Replaced sequential matching with a two-pass algorithm. The converter now computes scores for all files first, and assigns matches by highest score (greedy assignment). This resolves conflicts where low-score matches could "steal" files from perfect matches, fixing false negatives and significantly improving overall accuracy.
+
 ## 🏗️ Building from Source
 
 ```bash

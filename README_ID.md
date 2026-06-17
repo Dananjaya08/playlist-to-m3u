@@ -104,6 +104,11 @@ Entry CSV                          File Audio
 5. **Skor** — Gabungkan kemiripan judul + kemiripan artis + bonus substring
 6. **Fallback** — Jika pencocokan standar gagal, coba pencocokan artis saja
 
+## 🆕 Pembaruan Terbaru
+
+**v1.1 (Terbaru)**
+- **Algoritma Pencocokan Two-Pass**: Mengganti pencocokan berurutan dengan algoritma dua tahap (two-pass). Converter sekarang menghitung skor untuk semua file terlebih dahulu, dan memasangkan berdasarkan skor tertinggi. Ini menyelesaikan konflik di mana pencocokan dengan skor rendah bisa "mencuri" file dari pencocokan sempurna, memperbaiki masalah lagu yang dianggap tidak ada (false negative) dan meningkatkan akurasi secara signifikan.
+
 ## 🏗️ Build dari Source Code
 
 ```bash
