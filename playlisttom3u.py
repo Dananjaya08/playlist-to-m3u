@@ -406,7 +406,6 @@ def process_csv(csv_path: str, audio_pool: list[str], threshold: float,
     matched   = []
     unmatched = []
 
-    available = list(audio_pool)
     file_cache = {}
 
     with open(csv_path, mode="r", encoding="utf-8-sig") as f:
@@ -415,6 +414,17 @@ def process_csv(csv_path: str, audio_pool: list[str], threshold: float,
 
     total_rows = len(rows)
     log_callback(lang["log_csv_count"].format(name=os.path.basename(csv_path), n=total_rows))
+
+    # Pre-cache all file info
+    for filename in audio_pool:
+        if filename not in file_cache:
+            file_cache[filename] = parse_filename(filename)
+
+    # ═══════════════════════════════════════════════════════
+    #  PASS 1: Compute best match for EVERY CSV entry
+    #          (do NOT remove files from pool yet)
+    # ═══════════════════════════════════════════════════════
+    candidates = []  # list of {index, track, artist, album, dur_ms, best_file, score}
 
     for i, row in enumerate(rows, 1):
         orig_track = row.get(COL_TRACK,  "").strip()
@@ -427,34 +437,101 @@ def process_csv(csv_path: str, audio_pool: list[str], threshold: float,
         if track != orig_track:
             log_callback(lang["log_alias_used"].format(orig=orig_track, alias=track))
 
-        file_match, score = find_best_match(track, artist, available, file_cache, threshold)
+        # Find best match against ALL files (no removal)
+        best_file, best_score = find_best_match(track, artist, audio_pool, file_cache, threshold)
 
-        if file_match:
-            matched.append({
-                "index":   i,
-                "file":    file_match,
-                "track":   orig_track,
-                "artist":  artist,
-                "album":   album,
-                "dur_sec": ms_to_seconds(dur_ms),
-                "score":   score,
-            })
-            available.remove(file_match)
-            log_callback(lang["log_ok"].format(i=i, track=track[:35], file=file_match[:40], score=score))
-        else:
-            unmatched.append({
-                "index":   i,
-                "track":   orig_track,
-                "artist":  artist,
-                "album":   album,
-                "dur_ms":  dur_ms,
-                "score":   score,
-            })
-            log_callback(lang["log_miss"].format(i=i, track=orig_track[:35], score=score))
-            
+        candidates.append({
+            "index":      i,
+            "orig_track": orig_track,
+            "track":      track,
+            "artist":     artist,
+            "album":      album,
+            "dur_ms":     dur_ms,
+            "best_file":  best_file,
+            "score":      best_score,
+        })
+
         progress_callback(i, total_rows)
 
+    # ═══════════════════════════════════════════════════════
+    #  PASS 2: Assign matches greedily by HIGHEST SCORE FIRST
+    #          This resolves conflicts — if two CSV entries want
+    #          the same file, the one with the higher score wins.
+    # ═══════════════════════════════════════════════════════
+    log_callback(lang.get("log_pass2_start", "\n[PASS 2] Resolving conflicts — highest score wins...\n"))
+
+    # Sort by score descending (highest confidence first)
+    sorted_candidates = sorted(candidates, key=lambda x: x["score"], reverse=True)
+
+    assigned_files = set()     # files already taken
+    assigned_indices = set()   # CSV indices already matched
+
+    for c in sorted_candidates:
+        if c["best_file"] and c["best_file"] not in assigned_files:
+            # This file is available — assign it
+            matched.append({
+                "index":   c["index"],
+                "file":    c["best_file"],
+                "track":   c["orig_track"],
+                "artist":  c["artist"],
+                "album":   c["album"],
+                "dur_sec": ms_to_seconds(c["dur_ms"]),
+                "score":   c["score"],
+            })
+            assigned_files.add(c["best_file"])
+            assigned_indices.add(c["index"])
+            log_callback(lang["log_ok"].format(
+                i=c["index"], track=c["track"][:35], 
+                file=c["best_file"][:40], score=c["score"]))
+        # If file was already taken, this entry needs re-matching (handled below)
+
+    # ═══════════════════════════════════════════════════════
+    #  PASS 3: Re-match entries whose file was stolen
+    #          Try to find their next-best match
+    # ═══════════════════════════════════════════════════════
+    remaining_pool = [f for f in audio_pool if f not in assigned_files]
+
+    for c in candidates:
+        if c["index"] in assigned_indices:
+            continue  # already matched
+
+        # Try to find a new match from remaining pool
+        if remaining_pool:
+            new_file, new_score = find_best_match(
+                c["track"], c["artist"], remaining_pool, file_cache, threshold)
+
+            if new_file:
+                matched.append({
+                    "index":   c["index"],
+                    "file":    new_file,
+                    "track":   c["orig_track"],
+                    "artist":  c["artist"],
+                    "album":   c["album"],
+                    "dur_sec": ms_to_seconds(c["dur_ms"]),
+                    "score":   new_score,
+                })
+                assigned_files.add(new_file)
+                assigned_indices.add(c["index"])
+                remaining_pool.remove(new_file)
+                log_callback(lang["log_ok"].format(
+                    i=c["index"], track=c["track"][:35], 
+                    file=new_file[:40], score=new_score))
+                continue
+
+        # No match found at all
+        unmatched.append({
+            "index":   c["index"],
+            "track":   c["orig_track"],
+            "artist":  c["artist"],
+            "album":   c["album"],
+            "dur_ms":  c["dur_ms"],
+            "score":   c["score"],
+        })
+        log_callback(lang["log_miss"].format(
+            i=c["index"], track=c["orig_track"][:35], score=c["score"]))
+
     # === ARTIST FALLBACK ===
+    available = [f for f in audio_pool if f not in assigned_files]
     if unmatched and available:
         log_callback(lang["log_fallback_start"])
         still_unmatched = []
