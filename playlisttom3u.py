@@ -38,7 +38,7 @@ if hasattr(sys.stdout, "reconfigure"):
 # ─────────────────────────────────────────────
 LANGUAGES = {
     "en": {
-        "window_title":       "PlaylistToM3U — Spotify CSV to M3U Converter",
+        "window_title":       "PlaylistToM3U v1.1 — Spotify CSV to M3U Converter",
         "config_frame":       " Configuration ",
         "btn_csv":            "Select CSV File...",
         "lbl_csv_empty":      "No CSV file selected.",
@@ -90,7 +90,7 @@ LANGUAGES = {
         "dlg_output_title":   "Select Output Folder",
     },
     "id": {
-        "window_title":       "PlaylistToM3U — Konverter Spotify CSV ke M3U",
+        "window_title":       "PlaylistToM3U v1.1 — Konverter Spotify CSV ke M3U",
         "config_frame":       " Konfigurasi ",
         "btn_csv":            "Pilih File CSV...",
         "lbl_csv_empty":      "Belum ada file CSV dipilih.",
