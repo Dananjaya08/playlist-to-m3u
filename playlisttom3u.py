@@ -38,7 +38,7 @@ if hasattr(sys.stdout, "reconfigure"):
 # ─────────────────────────────────────────────
 LANGUAGES = {
     "en": {
-        "window_title":       "PlaylistToM3U v1.1 — Spotify CSV to M3U Converter",
+        "window_title":       "PlaylistToM3U v1.2 — Spotify CSV to M3U Converter",
         "config_frame":       " Configuration ",
         "btn_csv":            "Select CSV File...",
         "lbl_csv_empty":      "No CSV file selected.",
@@ -90,7 +90,7 @@ LANGUAGES = {
         "dlg_output_title":   "Select Output Folder",
     },
     "id": {
-        "window_title":       "PlaylistToM3U v1.1 — Konverter Spotify CSV ke M3U",
+        "window_title":       "PlaylistToM3U v1.2 — Konverter Spotify CSV ke M3U",
         "config_frame":       " Konfigurasi ",
         "btn_csv":            "Pilih File CSV...",
         "lbl_csv_empty":      "Belum ada file CSV dipilih.",
@@ -642,11 +642,15 @@ def process_csv(csv_path: str, audio_pool: list[str], threshold: float,
                 ind_arts = [normalize(a.strip()) for a in u_artist.split(',') if normalize(a.strip())]
                 is_match = False
                 for ind in ind_arts:
-                    if len(ind) >= 3 and (ind in f_art or f_art in ind or ind in f_full):
-                        is_match = True
-                        break
+                    if len(ind) >= 3:
+                        if f_art and (ind in f_art or f_art in ind):
+                            is_match = True
+                            break
+                        if ind in f_full:
+                            is_match = True
+                            break
                 
-                if is_match or similarity(norm_u_art, f_art) >= 0.8:
+                if is_match or (norm_u_art and f_art and similarity(norm_u_art, f_art) >= 0.8):
                     possible_files.append(f)
             
             # If exactly 1 file matches the artist, pair them
