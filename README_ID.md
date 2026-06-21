@@ -109,6 +109,7 @@ Entry CSV                          File Audio
 **v1.2 (Terbaru)**
 - **Intelligent Noise Word Filtering**: Aplikasi sekarang secara otomatis membuang istilah generik (seperti "Slowed", "Sped Up", "Remix", "Instrumental", "Montagem") sebelum menghitung skor kemiripan. Ini mencegah lagu yang berbeda namun memiliki tag generik yang sama agar tidak dipasangkan secara keliru.
 - **Validasi Artist Gate**: Untuk hasil pencocokan dengan skor rendah, algoritma kini mewajibkan adanya kecocokan nama artis yang ketat untuk menghilangkan false positives (pencocokan salah).
+- **Bug Fix**: Memperbaiki bug logika kritis pada fitur Artist Fallback di mana string artis kosong dapat menyebabkan lagu yang sama sekali tidak berhubungan saling berpasangan secara keliru.
 
 **v1.1**
 - **Algoritma Pencocokan Two-Pass**: Mengganti pencocokan berurutan dengan algoritma dua tahap (two-pass). Converter sekarang menghitung skor untuk semua file terlebih dahulu, dan memasangkan berdasarkan skor tertinggi. Ini menyelesaikan konflik di mana pencocokan dengan skor rendah bisa "mencuri" file dari pencocokan sempurna, memperbaiki masalah lagu yang dianggap tidak ada (false negative) dan meningkatkan akurasi secara signifikan.

@@ -109,6 +109,7 @@ CSV Entry                          Audio File
 **v1.2 (Latest)**
 - **Intelligent Noise Word Filtering**: The converter now automatically strips generic terms (like "Slowed", "Sped Up", "Remix", "Instrumental", "Montagem") before calculating scores, preventing different songs with the same generic tags from falsely matching.
 - **Artist Gate Validation**: For lower confidence score matches, the algorithm now enforces strict artist overlap validation to eliminate false positives.
+- **Bug Fix**: Fixed a critical logic bug in the Artist Fallback feature where empty artist strings could cause completely unrelated songs to falsely match each other.
 
 **v1.1**
 - **Two-Pass Matching Algorithm**: Replaced sequential matching with a two-pass algorithm. The converter now computes scores for all files first, and assigns matches by highest score (greedy assignment). This resolves conflicts where low-score matches could "steal" files from perfect matches, fixing false negatives and significantly improving overall accuracy.
